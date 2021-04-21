@@ -3,7 +3,7 @@ import requests
 # This function will pass your text to the machine learning model
 # and return the top result with the highest confidence
 def classify(text):
-    key = "dd1fb1a0-a18b-11eb-9d21-0188bc1272ec3c0a7a03-be22-45fe-8d89-65d66b2fc6ae"
+    key = "5fa87800-a2c7-11eb-9e86-fdccf43bc69d434cef89-f8e4-4580-8bed-8d97e9f3a3ef"
     url = "https://machinelearningforkids.co.uk/api/scratch/"+ key + "/classify"
 
     response = requests.get(url, params={ "data" : text })
@@ -17,12 +17,10 @@ def classify(text):
 
 
 # CHANGE THIS to something you want your machine learning model to classify
-for i in range(4):
-    texto = input("Coloca aqui tu palabra")
-    demo = classify(texto)
+demo = classify("The text that you want to test")
 
-    label = demo["class_name"]
-    confidence = demo["confidence"]
+label = demo["class_name"]
+confidence = demo["confidence"]
 
 
 # CHANGE THIS to do something different with the result
