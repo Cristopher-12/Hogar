@@ -1,24 +1,24 @@
+import sys 
+import os
 import requests
 import json
-import sys
-import os
+import urllib
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from PIL import Image, ImageOps
-import numpy as np
-
 
 token = "1775871252:AAE-503J0CK3y5Yf0pjdvC0Kd_Xt0_PjlBs"
 
-def start(bot, update):
+def start(bot,update):
     try:
+
         username = update.message.from_user.username
         message = "Hola " + username
         update.message.reply_text(message)
-    except Exception as error:
-        print("Error 001: {}".format(error.args[0]))
+
+    except Exception as e:
+        print ("Error001: {}".format(error.args[0]))
 
 def classify(text):
-    key = "dd1fb1a0-a18b-11eb-9d21-0188bc1272ec3c0a7a03-be22-45fe-8d89-65d66b2fc6ae"
+    key = "5fa87800-a2c7-11eb-9e86-fdccf43bc69d434cef89-f8e4-4580-8bed-8d97e9f3a3ef"
     url = "https://machinelearningforkids.co.uk/api/scratch/"+ key + "/classify"
 
     response = requests.get(url, params={ "data" : text })
@@ -30,8 +30,6 @@ def classify(text):
     else:
         response.raise_for_status()
 
-    message = params
-
 def echo(bot,update):
     try:
 
@@ -39,65 +37,72 @@ def echo(bot,update):
         demo = classify(text)
         label = demo["class_name"]
 
-        message = "El genero de pelicula con el que se relaciona el texto es : %s" %(label)
+        message = "El objeto que ingresaste corresponde a : %s" %(label)
         update.message.reply_text(message)
 
     except Exception as e:
         print ("Error002: "+type(e).__name__)
 
-
-def help(bot, update):
+def help(bot,update):
     try:
-        message = "Puedes enviar texto o imagenes."
+
+        message = """Tambien puedo reconocer Objetos del Hogar:
+            Autos
+            Sala
+            Cocina
+            Dormitorio"""
         update.message.reply_text(message)
-    except Exception as error:
-        print("Error 003 {}".format(error.args[0]))
 
-def error(bot, update, error):
-    try:
-        print(error)
     except Exception as e:
-        print("Error 004 {}".format(e.args[0]))
+        print ("Error003: "+type(e).__name__)
 
-def getImage(bot, update):
+def getImage(bot,update):
     try:
-        message = "Recibiendo imagen"
+
+        message = "Analizando imagen"
         update.message.reply_text(message)
 
         file = bot.getFile(update.message.photo[-1].file_id)
         id = file.file_id
+            
+        filename = os.path.join("src/","{}.jpg".format(id))
 
-        filename = os.path.join("descargas/", "{}.jpg".format(id))
         file.download(filename)
-        
-        message = "Imagen guardada"
-        update.message.reply_text(message)
 
-        files = { "myfile": open(filename, "rb") }
-        message = "Procesando imagen"
-        update.message.reply_text(message)
-        result = requests.post("https://8080-black-primate-h5eh4yq1.ws-us03.gitpod.io/upload", files = files)
-                                
-        
-        update.message.reply_text(r.text)
+        r = enviar(id)
 
+        update.message.reply_text(r)
 
     except Exception as e:
-        print("Error 007: {}".format(e.args[0]))
+        print ("Error007: "+type(e).__name__)
 
-def evaluar(bot,filename):
+def enviar(id):
+    data2 = {'myfile': open('src/{}.jpg'.format(id), 'rb')}
+
+    url = "https://8080-red-crow-k3ybte9c.ws-us03.gitpod.io/upload?"
+
+    result = requests.post(url, files = data2)
+
+    res = result.json()
+
+    respuesta = res["resultado"]
+
+    return respuesta
+
+def error (bot, update, error):
     try:
-        message="Verificando la imagen..."
-        update.message.reply_text(message)       
-        params = {'myfile':filename}
-        r = requests.post("https://8080-black-primate-h5eh4yq1.ws-us03.gitpod.io/upload", myfile=files)
-        print(r.text)
-        update.message.reply_text(r.text)
-    except Exception as error:
-        print("Error 027 {}".format(e.args[0]))
 
+        print(error)
+
+    except Exception as e:
+        print ("Error004: "+type(e).__name__)
+
+
+    
 def main():
     try:
+        token = "1775871252:AAE-503J0CK3y5Yf0pjdvC0Kd_Xt0_PjlBs"
+
         updater = Updater(token)
         dp = updater.dispatcher
 
@@ -111,13 +116,12 @@ def main():
 
         updater.start_polling()
         updater.idle()
-        print("Bot listo")
-    except Exception as e:
-        print("Error 005: {}".format(e.args[0]))
-        
-if __name__ == "__main__":
 
-    try:
+    except Exception as e:
+        print ("Error005: "+type(e).__name__)
+    
+if __name__ == "__main__":
+    try: 
         main()
-    except Exception as error:
-        print("Error 006 {}".format(error.args[0]))
+    except Exception as e:
+        print ("Error006: "+type(e).__name__)
